@@ -1,0 +1,391 @@
+:root {
+    --user-accent-color: #569cd6;
+    --user-accent-light: color-mix(in srgb, var(--user-accent-color) 120%, white 20%);
+    --user-accent-dim: color-mix(in srgb, var(--user-accent-color) 80%, transparent);
+    --user-accent-subtle: color-mix(in srgb, var(--user-accent-color) 30%, transparent);
+    --user-accent-highlight: color-mix(in srgb, var(--user-accent-color) 40%, transparent);
+    --user-accent-search: color-mix(in srgb, var(--user-accent-color) 50%, transparent);
+
+    --body-background-color: #1c1c1c;
+    --section-background-color: #1c1c1c;
+    --detail-background-color: #242424;
+    --code-background-color: #2a2a2a;
+    --mark-background-color: #3a3a3a;
+    --detail-block-color: #242424;
+
+    --body-text-color: #e8e8e8;
+    --block-text-color: #d8d8d8;
+
+    --scrollbar-track-color: var(--detail-background-color);
+    --scrollbar-thumb-color: rgba(255, 255, 255, 50%);
+
+    --navbar-background-color: var(--detail-block-color);
+    --navbar-text-color: white;
+    /* --subnav-background-color: #282828; */
+    --subnav-background-color: #242424;
+    --subnav-link-color: var(--user-accent-color);
+    --member-heading-background-color: #282828;
+
+    --selected-background-color: var(--user-accent-dim);
+    --selected-text-color: white;
+    --selected-link-color: var(--user-accent-color);
+
+    --table-border-color: #3a3a3a;
+    --table-header-color: #2a2a2a;
+
+    --even-row-color: #1e1e1e;
+    --odd-row-color: #242424;
+
+    --title-color: var(--user-accent-color);
+    --link-color: var(--user-accent-color);
+    --link-color-active: var(--user-accent-light);
+
+    --toc-background-color: #1e1e1e;
+    --toc-highlight-color: var(--user-accent-subtle);
+    --toc-hover-color: #2a2a2a;
+
+    --snippet-background-color: #2a2a2a;
+    --snippet-text-color: #d8d8d8;
+    --snippet-highlight-color: var(--user-accent-highlight);
+    --pre-background-color: #2a2a2a;
+    --pre-text-color: #d8d8d8;
+
+    --border-color: #3a3a3a;
+
+    --search-input-background-color: #2a2a2a;
+    --search-input-text-color: #e8e8e8;
+    --search-input-placeholder-color: #7a7a7a;
+    --search-tag-highlight-color: var(--user-accent-search);
+
+    --button-border-color: #4a4a4a;
+    --button-active-filter: brightness(85%);
+    --button-focus-filter: brightness(115%);
+
+    --invalid-tag-background-color: #3d2929;
+    --invalid-tag-text-color: #fca5a5;
+
+    --source-linenumber-color: #7a7a7a;
+
+    --glass-deprecated-light-color: rgba(239, 185, 68, 0.9);
+    --glass-deprecated-dark-color: rgba(239, 185, 68, 0.45);
+    --glass-background-light-color: rgba(255, 255, 255, 0.25);
+    --glass-background-dark-color: rgba(255, 255, 255, 0.1);
+
+    /* VSCode theme colours */
+    --theme-function-color: #dcdcaa;
+    --theme-type-color: #4ec9b0;
+    --theme-variable-color: #9cdcfe;
+    --theme-branch-keyword-color: #c586c0;
+    --theme-keyword-color: #569cd6;
+    --theme-literal-color: #b5cea8;
+    --theme-string-color: #ce9178;
+    --theme-comment-color: #6a9955;
+
+    /* NOTE: This can be really laggy to update for the easter egg .. */
+    /* accent-color: var(--user-accent-color); */
+
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+    scroll-behavior: smooth;
+
+    /* Because Oracle's shitty style.js causes heaps of forced reflows... */
+    /* will-change: scroll-position; */
+}
+
+/* Lags in the christmas theme, but there are bigger fish to fry */
+::selection {
+    /* will-change: background-color; */
+
+    background-color: var(--user-accent-search);
+    color: #ffffff;
+}
+
+hr {
+    border-color: var(--border-color);
+}
+
+/*
+  Highlighted code blocks and tt text!
+  It can be too much, so just disable it if so.
+*/
+/* code, tt {
+  background-color: var(--code-background-color);
+  padding: .125rem .25rem;
+  border-radius: .1875rem;
+} */
+
+/* Keyboard shortcut label things */
+kbd {
+    background-color: var(--code-background-color);
+    border: 0.0625rem solid var(--button-border-color);
+    box-shadow: 0 0.0625rem 0.0625rem rgba(0, 0, 0, 0.4),
+        0 0.125rem 0 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+/* the Focus outline */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+    outline: 0.125rem solid var(--user-accent-color);
+    outline-offset: 0.125rem;
+}
+
+.deprecation-block,
+.preview-block,
+.restricted-block {
+    background-color: #2a2a2a;
+    border-color: var(--button-border-color);
+    box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.18);
+}
+
+/* Input/search boxes styles */
+
+#search-input,
+.filter-input,
+#page-search-input {
+    background: var(--search-input-background-color);
+    border: 0.125rem solid var(--border-color);
+    border-radius: 0.375rem;
+    padding: 0.125rem 0.625rem;
+    color: var(--search-input-text-color);
+    font-size: 0.875rem;
+    width: 21.875rem;
+    max-width: calc(100vw - 6.25rem);
+    transition: all 0.3s ease;
+    box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.18);
+}
+
+#search-input:hover,
+.filter-input:hover,
+#page-search-input:hover {
+    border-color: var(--button-border-color);
+    box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.48);
+}
+
+#search-input:focus,
+.filter-input:focus,
+#page-search-input:focus {
+    border-color: var(--user-accent-color);
+    background: #2d2d2d;
+    box-shadow: 0 0 0 0.1875rem var(--user-accent-subtle), 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.48);
+    outline: none;
+}
+
+#search-input::placeholder,
+.filter-input::placeholder,
+#page-search-input::placeholder {
+    color: var(--search-input-placeholder-color);
+    opacity: 1;
+}
+
+#reset-search {
+    right: 0.75rem;
+    top: 50%;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+#reset-search:hover {
+    opacity: 0.7;
+}
+
+input[type="text"] {
+    background-image: none;
+    padding: 0.125rem 0.625rem;
+}
+
+/* Navbar close open icon */
+button#navbar-toggle-button .nav-bar-toggle-icon {
+    background-color: white;
+}
+
+/* Navbar about message label */
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
+}
+
+/* Labels sharing common liquid glass style properties */
+.about-language,
+.deprecated-label {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.0625rem;
+    color: rgba(255, 255, 255, 0.95);
+    background: linear-gradient(
+        135deg,
+        var(--glass-background-light-color),
+        var(--glass-background-dark-color)
+    );
+    /* put the filter so it's blurry */
+    backdrop-filter: blur(1.25rem) saturate(180%);
+    -webkit-backdrop-filter: blur(1.25rem) saturate(180%);
+    /* the glass border (subtle gradient for the effect) */
+    border: 0.0625rem solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    /* adds the line glow part to the top of the label */
+    box-shadow: inset 0 0.0625rem 0.0625rem rgba(255, 255, 255, 0.5),
+        inset 0 -0.0625rem 0.0625rem rgba(0, 0, 0, 0.05), 0 0.5rem 2rem rgba(0, 0, 0, 0.15),
+        0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Prevent text selection for label-like behavior */
+    user-select: none;
+
+    position: relative;
+    overflow: hidden;
+}
+
+/* Use warning colour for deprecated description */
+.deprecated-label {
+    background: linear-gradient(
+        135deg,
+        var(--glass-deprecated-light-color),
+        var(--glass-deprecated-dark-color)
+    );
+
+    padding: 0.25rem 0.5rem;
+}
+
+.about-language {
+    /* used for the label shine effect */
+    &::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            45deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.15) 50%,
+            transparent 70%
+        );
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+
+        contain: layout style paint;
+    }
+
+    /* the label hover effect */
+    &:hover {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: inset 0 0.0625rem 0.0625rem rgba(255, 255, 255, 0.6),
+            inset 0 -0.0625rem 0.0625rem rgba(0, 0, 0, 0.05), 0 0.75rem 2.5rem rgba(0, 0, 0, 0.2),
+            0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-0.0625rem);
+    }
+}
+
+/* Used for the easter egg */
+
+@keyframes christmas-accent {
+    0% {
+        --user-accent-color: hsl(0 75% 45%);
+    }
+    25% {
+        --user-accent-color: hsl(120 55% 40%);
+    }
+    50% {
+        --user-accent-color: hsl(45 70% 60%);
+    }
+    75% {
+        --user-accent-color: hsl(0 0% 95%);
+    }
+    100% {
+        --user-accent-color: hsl(0 75% 45%);
+    }
+}
+
+#snowflake-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none !important;
+    z-index: 9999;
+    overflow: hidden;
+    contain: strict;
+}
+
+.snowflake-object {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.13);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    pointer-events: none !important;
+    display: block;
+
+    /* will-change: transform; */
+    contain: content;
+}
+
+/* ---------------------------------------------------------- */
+/* Style information generated by the javadoc-prettier parser */
+/* ---------------------------------------------------------- */
+
+.theme-method-name {
+    color: var(--theme-function-color) !important;
+}
+
+.theme-field-name,
+.theme-method-parameter {
+    color: var(--theme-variable-color) !important;
+}
+
+.theme-type-unresolved,
+.theme-type-class,
+.theme-type-generic {
+    color: var(--theme-type-color) !important;
+}
+
+.theme-keyword,
+.theme-type-primitive {
+    color: var(--theme-keyword-color) !important;
+}
+
+.theme-keyword-branch {
+    color: var(--theme-branch-keyword-color) !important;
+}
+
+.theme-literal-number {
+    color: var(--theme-literal-color) !important;
+}
+.theme-literal-string {
+    color: var(--theme-string-color) !important;
+}
+.theme-literal-bool {
+    color: var(--theme-keyword-color) !important;
+}
+
+.theme-comment,
+.theme-doctag-comment {
+    color: var(--theme-comment-color) !important;
+}
+
+/* ------------------------------------------------------ */
+/* Optimisations to original stylesheet because it's slow */
+/* ------------------------------------------------------ */
+
+/* .title,
+nav a:link,
+nav a:visited,
+a:link,
+a:visited,
+a[href]:hover,
+a[href]:active,
+nav.toc a.current-selection,
+.nav-bar-cell1-rev {
+    contain: paint style !important;
+} */
+
+/* .toc-list {
+    will-change: scroll-position !important;
+} */

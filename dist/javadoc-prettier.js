@@ -1,12 +1,5 @@
-// @bun
-// src/index.tsx
-var EASTER_EGG_TEXT = "christmas";
-var SNOWFLAKE_CHARS = ["\u2744", "\u2745", "\u2746"];
-var PARAMETER_LIST_REGEX = /(?<type>\b[\w.]*\w)[\s\u00A0]+(?<name>\w+)/g;
-var SEARCHRESULT_FIELD_REGEX = /(?<className>\w+)\.+(?<name>\w+)/;
-var SEARCHRESULT_CTOR_REGEX = /(?<![\w.])(?<className>[^\W.]+)\((?<paramList>[^)]*)\)/;
-var SEARCHRESULT_METHOD_REGEX = /(?<className>\w+)\.(?<name>\w+)\((?<paramList>[^)]*)\)/;
-var JAVA_PRIMITIVE_TYPE_KEYWORDS = [
+// src/constants.ts
+var JAVA_PRIMITIVE_TYPES = new Set([
   "byte",
   "short",
   "int",
@@ -14,383 +7,73 @@ var JAVA_PRIMITIVE_TYPE_KEYWORDS = [
   "float",
   "double",
   "char",
-  "boolean"
-];
-function waitForSearchIndex(timeout = 3000) {
-  return new Promise((resolve, reject) => {
-    if (memberSearchIndex != null) {
-      resolve();
-      return;
-    }
-    const interval = setInterval(() => {
-      if (memberSearchIndex != null) {
-        clearInterval(interval);
-        clearTimeout(timeoutId);
-        resolve();
-      }
-    }, 100);
-    const timeoutId = setTimeout(() => {
-      clearInterval(interval);
-      reject(new Error(`Style helper timed out waiting on member-search-index.js`));
-    }, timeout);
-  });
-}
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
-async function init() {
-  try {
-    const beforeWait = performance.now();
-    await waitForSearchIndex().then(() => {
-      const afterWait = performance.now();
-      console.info(`Waiting for search index took ${Number.parseFloat(`${afterWait - beforeWait}`).toFixed()}ms`);
-    }).catch((reason) => {
-      console.error(`Waiting for search index raised an error: ${reason}`);
-      return;
-    });
-    activateEasterEgg();
-    const beforeStyle = performance.now();
-    styleDocument().then(() => {
-      const afterStyle = performance.now();
-      console.info(`Styling entire document took ${Number.parseFloat(`${afterStyle - beforeStyle}`).toFixed()}ms!`);
-    });
-  } catch (error) {
-    console.error("Style helper had an error that stopped it from working: ", error);
+  "boolean",
+  "void"
+]);
+var JAVA_KEYWORDS = new Set([
+  "class",
+  "interface",
+  "enum",
+  "extends",
+  "implements",
+  "native",
+  "protected",
+  "private",
+  "public",
+  "static",
+  "final",
+  "throws"
+]);
+var NAME = "javadoc-prettier";
+var REGEX = {
+  modifierTypePattern: /(?<whitespace>\s+)|(?<syntax>[<>(),;.])|(?<word>\w+(?:\.\w+)*)/g,
+  parameterList: /(?<type>\b[\w.]*\w)[\s\u00A0]+(?<name>\w+)/g,
+  searchListField: /(?<className>\w+)\.+(?<name>\w+)/,
+  searchListConstructor: /(?<![\w.])(?<className>[^\W.]+)\((?<paramList>[^)]*)\)/,
+  searchListMethod: /(?<className>\w+)\.(?<name>\w+)\((?<paramList>[^)]*)\)/
+};
+var CSS_CLASSES = {
+  theme: {
+    keyword: "theme-keyword",
+    primitive: "theme-type-primitive",
+    class: "theme-type-class",
+    unresolved: "theme-type-unresolved",
+    fieldName: "theme-field-name",
+    comment: "theme-comment",
+    methodName: "theme-method-name",
+    parameterName: "theme-parameter-name",
+    syntax: "theme-syntax"
   }
-}
-async function styleDocument() {
-  styleUnresolvedTypes();
-  styleMethods();
-  styleSearchResults();
-  styleLiterals();
-  styleHeaderText();
-}
-async function styleUnresolvedTypes() {
-  console.debug("Styling unresolved types...");
-  document.querySelectorAll("#class-description .notes > dd > code").forEach((e) => {
-    if (!(e instanceof HTMLElement)) {
-      return;
-    }
-    if (hasBeenStyled(e)) {
-      return;
-    }
-    const nodes = Array.from(e.childNodes);
-    nodes.filter((node) => node.nodeType === Node.TEXT_NODE).forEach((node) => {
-      const raw = node.data;
-      if (raw === ", ") {
-        return;
-      }
-      const name = raw.replace(/,\s*$/, "").trim();
-      if (!name) {
-        return;
-      }
-      const fragment = document.createDocumentFragment();
-      const span = document.createElement("span");
-      span.classList.add("theme-type-unresolved");
-      span.textContent = name;
-      span.title = `unresolved type in ${getClassPackageName(name)}`;
-      fragment.appendChild(span);
-      const trailing = raw.slice(raw.lastIndexOf(name) + name.length);
-      if (trailing) {
-        fragment.appendChild(document.createTextNode(trailing));
-      }
-      node.replaceWith(fragment);
-    });
-  });
-  document.querySelectorAll(".summary-table > .col-first > code, .return-type").forEach((e) => {
-    if (!(e instanceof HTMLElement)) {
-      return;
-    }
-    if (hasBeenStyled(e)) {
-      return;
-    }
-    const t = e.textContent;
-    if (t.includes(".")) {
-      e.classList.add("theme-type-unresolved");
-      e.title = `unresolved type in ${getClassPackageName(t)}`;
-    }
-  });
-}
-async function styleMethods() {
-  console.debug("Styling methods...");
-  styleModifiers();
-  styleParameterLists();
-  styleMethodDetails();
-  document.querySelectorAll(".class-use-page .class-uses .summary-table > .col-second > .type-name-label").forEach((e) => {
-    if (!(e instanceof HTMLElement)) {
-      return;
-    }
-    if (hasBeenStyled(e)) {
-      return;
-    }
-    if (!e.textContent.endsWith(".")) {
-      return;
-    }
-    e.textContent = e.textContent.slice(0, -1);
-    e.classList.add("theme-type-class");
-    e.insertAdjacentText("afterend", ".");
-  });
-}
-async function styleModifiers() {}
-async function styleParameterLists() {
-  document.querySelectorAll("#constructor-summary .summary-table > .col-constructor-name > code," + "#method-summary-table .summary-table > .col-second > code," + "#constructor-detail .member-list .member-signature > .parameters," + "#method-detail .member-list .member-signature > .parameters," + ".class-use-page .class-uses .summary-table .col-second > code").forEach((e) => {
-    if (!(e instanceof HTMLElement)) {
-      return;
-    }
-    if (hasBeenStyled(e)) {
-      return;
-    }
-    const textNodes = getElementTextNodes(e);
-    for (const node of textNodes) {
-      const text = node.data;
-      if (!isTextNodeValid(node)) {
-        continue;
-      }
-      PARAMETER_LIST_REGEX.lastIndex = 0;
-      let m = PARAMETER_LIST_REGEX.exec(text);
-      if (!m || m.groups === undefined) {
-        continue;
-      }
-      const fragment = document.createDocumentFragment();
-      let lastIdx = 0;
-      do {
-        const type = m.groups["type"];
-        const name = m.groups["name"];
-        if (m.index > lastIdx) {
-          fragment.appendChild(document.createTextNode(text.slice(lastIdx, m.index)));
-        }
-        const typeSpan = document.createElement("span");
-        typeSpan.textContent = type;
-        if (JAVA_PRIMITIVE_TYPE_KEYWORDS.includes(type)) {
-          typeSpan.classList.add("theme-type-primitive");
-        } else {
-          typeSpan.classList.add("theme-type-unresolved");
-          typeSpan.title = `unresolved type in ${getClassPackageName(type)}`;
-        }
-        fragment.appendChild(typeSpan);
-        fragment.appendChild(document.createTextNode("\xA0"));
-        const nameSpan = document.createElement("span");
-        nameSpan.classList.add("theme-method-param-name");
-        nameSpan.textContent = name;
-        fragment.appendChild(nameSpan);
-        lastIdx = m.index + m[0].length;
-      } while ((m = PARAMETER_LIST_REGEX.exec(text)) && m.groups !== undefined);
-      if (lastIdx < text.length) {
-        fragment.appendChild(document.createTextNode(text.slice(lastIdx)));
-      }
-      node.replaceWith(fragment);
-    }
-  });
-}
-async function styleMethodDetails() {
-  document.querySelectorAll("#method-detail > .member-list .member-signature > .exceptions").forEach((e) => {
-    if (!(e instanceof HTMLElement)) {
-      return;
-    }
-    if (hasBeenStyled(e)) {
-      return;
-    }
-    let node = e.previousSibling;
-    if (!node || node.nodeType !== Node.TEXT_NODE) {
-      return;
-    }
-    let text = node.textContent;
-    let lhsEnd = text.indexOf("throws");
-    let rhsStart = lhsEnd + ("throws".length + 1);
-    if (lhsEnd === -1) {
-      return;
-    }
-    const lhs = text.slice(0, lhsEnd);
-    const keyword = text.slice(lhsEnd + 1, rhsStart - 1);
-    const rhs = text.slice(rhsStart);
-    const fragment = document.createDocumentFragment();
-    const span = document.createElement("span");
-    span.classList.add("theme-type-keyword");
-    span.textContent = keyword;
-    fragment.append(lhs, span, rhs);
-    node.replaceWith(fragment);
-  });
-  document.querySelectorAll("#method-detail > .member-list .notes > dd").forEach((e) => {
-    if (!(e instanceof HTMLElement)) {
-      return;
-    }
-    if (hasBeenStyled(e)) {
-      return;
-    }
-    let node = e.lastChild;
-    if (!node || node.nodeType !== Node.TEXT_NODE) {
-      return;
-    }
-    let text = node.textContent;
-    if (!text.startsWith(" - ")) {
-      return;
-    }
-    node.textContent = " - ";
-    text = text.slice(3);
-    const span = document.createElement("span");
-    span.classList.add("theme-doctag-comment");
-    span.textContent = text;
-    node.after(span);
-  });
-}
-async function styleSearchResults() {
-  console.debug("Styling search results...");
-  document.querySelectorAll(".search-result-label").forEach((e) => {
-    if (!(e instanceof HTMLElement)) {
-      return;
-    }
-    if (hasBeenStyled(e)) {
-      return;
-    }
-    let textContent = "";
-    let highlightSpan = null;
-    let highlightPosition = -1;
-    for (const node of e.childNodes) {
-      if (node.nodeType === Node.TEXT_NODE) {
-        textContent += node.textContent;
-      } else if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains("result-highlight")) {
-        highlightSpan = node.cloneNode(true);
-        highlightPosition = textContent.length;
-        textContent += node.textContent;
-      }
-    }
-    const descEl = e.parentElement && e.parentElement.querySelector(".search-result-desc");
-    const description = descEl ? descEl.textContent.toLowerCase() : "";
-    let match;
-    if (description.startsWith("class") || description.startsWith("enum class") || description.startsWith("interface")) {
-      const frag = document.createDocumentFragment();
-      const classSpan = document.createElement("span");
-      classSpan.classList.add("theme-type-class");
-      if (highlightSpan && highlightPosition >= 0 && highlightPosition < textContent.length) {
-        const before = textContent.substring(0, highlightPosition);
-        if (before) {
-          classSpan.appendChild(document.createTextNode(before));
-        }
-        classSpan.appendChild(highlightSpan);
-        const after = textContent.substring(highlightPosition + highlightSpan.textContent.length);
-        if (after) {
-          classSpan.appendChild(document.createTextNode(after));
-        }
-      } else {
-        classSpan.textContent = textContent;
-      }
-      frag.appendChild(classSpan);
-      e.replaceChildren(frag);
-      return;
-    } else if ((match = textContent.match(SEARCHRESULT_CTOR_REGEX)) && match.groups !== undefined) {
-      return;
-    } else if ((match = textContent.match(SEARCHRESULT_FIELD_REGEX)) && match.groups !== undefined) {
-      return;
-    } else if ((match = textContent.match(SEARCHRESULT_METHOD_REGEX)) && match.groups !== undefined) {
-      const className = match.groups["className"];
-      const funcName = match.groups["name"];
-      const params = match.groups["paramList"];
-      const paramList = params.split(",").map((p) => p.trim()).filter((p) => p.length > 0);
-      const frag = document.createDocumentFragment();
-      const classSpan = document.createElement("span");
-      classSpan.classList.add("theme-type-class");
-      classSpan.textContent = className;
-      frag.appendChild(classSpan);
-      frag.appendChild(document.createTextNode("."));
-      const methodSpan = document.createElement("span");
-      methodSpan.classList.add("theme-method-name");
-      const start = className.length + 1;
-      const end = start + funcName.length;
-      if (highlightSpan && highlightPosition >= start && highlightPosition < end) {
-        const before = funcName.substring(0, highlightPosition - start);
-        const after = funcName.substring(highlightPosition - start + highlightSpan.textContent.length);
-        if (before)
-          methodSpan.appendChild(document.createTextNode(before));
-        methodSpan.appendChild(highlightSpan);
-        if (after)
-          methodSpan.appendChild(document.createTextNode(after));
-      } else {
-        methodSpan.textContent = funcName;
-      }
-      frag.appendChild(methodSpan);
-      frag.appendChild(document.createTextNode("("));
-      for (let i = 0;i < paramList.length; i++) {
-        const param = paramList[i];
-        const paramSpan = document.createElement("span");
-        if (JAVA_PRIMITIVE_TYPE_KEYWORDS.includes(param.toLowerCase())) {
-          paramSpan.classList.add("theme-type-primitive");
-        } else {
-          paramSpan.classList.add("theme-type-class");
-        }
-        paramSpan.textContent = param;
-        frag.appendChild(paramSpan);
-        if (i < paramList.length - 1) {
-          frag.appendChild(document.createTextNode(", "));
-        }
-      }
-      frag.appendChild(document.createTextNode(")"));
-      e.replaceChildren(frag);
-      return;
-    }
-  });
-}
-async function styleLiterals() {
-  console.debug("Styling constant literals...");
-  document.querySelectorAll(".constants-summary > .block-list > li > .summary-table > .col-last > code").forEach((e) => {
-    if (!(e instanceof HTMLElement)) {
-      return;
-    }
-    if (hasBeenStyled(e)) {
-      return;
-    }
-    const text = e.textContent;
-    if (text.startsWith('"') && text.endsWith('"')) {
-      e.classList.add("theme-literal-string");
-    } else if (text.startsWith("0x") || text.endsWith("f") || text.endsWith("L") || text.endsWith("D") || !isNaN(Number(text))) {
-      e.classList.add("theme-literal-number");
-    } else if (text === "true" || text === "false") {
-      e.classList.add("theme-literal-bool");
-    }
-  });
-}
-async function styleHeaderText() {
-  console.debug("Styling header text...");
-  const e = document.querySelector("div.about-language");
-  if (!e || !(e instanceof HTMLElement) || hasBeenStyled(e)) {
-    return;
-  }
-  const text = e.textContent;
-  e.replaceChildren();
-  const a = document.createElement("a");
-  a.classList.add("repository-link");
-  a.textContent = text;
-  if (window.location.hostname.endsWith(".github.io")) {
-    const githubUser = window.location.hostname.split(".")[0];
-    const repositoryName = window.location.pathname.replaceAll("/", "");
-    a.href = `https://github.com/${githubUser}/${repositoryName}`;
-  }
-  e.appendChild(a);
-}
-function hasBeenStyled(e) {
-  if (e.dataset["styled"]) {
-    return true;
-  }
-  e.dataset["styled"] = "1";
-  return false;
-}
-function getClassPackageName(name) {
-  return name.slice(0, name.lastIndexOf("."));
-}
-function getElementTextNodes(e) {
-  const walker = document.createTreeWalker(e, NodeFilter.SHOW_TEXT, null);
-  const nodes = [];
-  let node;
-  while (node = walker.nextNode()) {
-    nodes.push(node);
-  }
-  return nodes;
-}
-function isTextNodeValid(node) {
-  const text = node.data;
-  return text.includes(" ") || text.includes("\xA0");
-}
+};
+var SELECTORS = {
+  inheritedList: ".inherited-list",
+  inheritanceTree: ".inheritance",
+  classDescription: "#class-description",
+  summaryTable: ".summary-table",
+  detailsBlock: ".detail .member-signature"
+};
+var IDS = {
+  nestedClassSummary: "nested-class-summary",
+  fieldSummary: "field-summary",
+  constructorSummary: "constructor-summary",
+  methodSummary: "method-summary",
+  fieldDetails: "field-detail",
+  constructorDetails: "constructor-detail",
+  methodDetails: "method-detail"
+};
+var LOGGER = {
+  trace: (...args) => console.trace(`[${NAME}]`, ...args),
+  debug: (...args) => console.debug(`[${NAME}]`, ...args),
+  info: (...args) => console.info(`[${NAME}]`, ...args),
+  warn: (...args) => console.warn(`[${NAME}]`, ...args),
+  error: (...args) => console.error(`[${NAME}]`, ...args)
+};
+var VIEWPORT_WIDTH = window.innerWidth;
+var VIEWPORT_HEIGHT = window.innerHeight;
+
+// src/easter-egg.ts
+var EASTER_EGG_TEXT = "christmas";
+var SNOWFLAKE_CHARS = ["❄", "❅", "❆"];
 function activateEasterEgg() {
   let keyboardBuffer = "";
   function keyboardListener(e) {
@@ -416,16 +99,15 @@ function activateEasterEgg() {
   document.addEventListener("keydown", keyboardListener);
 }
 function startChristmasTheme() {
-  document.querySelector(":root").style.animation = "christmas-accent 3s linear infinite";
   createSnowflakeOverlay();
 }
-var SNOWFLAKE_POOL = [];
 var ACTIVE_SNOWFLAKES = [];
 var SNOWFLAKE_PROPS = new WeakMap;
 var snowflakeContainer;
 function createSnowflakeOverlay() {
   snowflakeContainer = document.createElement("div");
   snowflakeContainer.id = "snowflake-container";
+  snowflakeContainer.style.willChange = "contents";
   document.body.appendChild(snowflakeContainer);
   const numFlakes = 50;
   for (let i = 0;i < numFlakes; i++) {
@@ -447,7 +129,7 @@ function initSnowflake(flake) {
   flake.textContent = char;
   flake.style.fontSize = `${size}px`;
   flake.style.opacity = `${Math.random() * 0.6 + 0.4}`;
-  flake.style.display = "block";
+  flake.style.willChange = "transform";
   SNOWFLAKE_PROPS.set(flake, {
     x: Math.random() * window.innerWidth,
     y: -50,
@@ -460,40 +142,383 @@ function initSnowflake(flake) {
 }
 function updateSnowflakePosition(flake) {
   const p = SNOWFLAKE_PROPS.get(flake);
-  flake.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${p.rotation}deg)`;
+  flake.style.transform = `translate3d(${p.x}px, ${p.y}px, 0px) rotate(${p.rotation}deg)`;
 }
 function getSnowflake() {
-  let flake = SNOWFLAKE_POOL.pop();
-  if (!flake) {
-    flake = createSnowflake();
-  }
+  let flake = createSnowflake();
   initSnowflake(flake);
   ACTIVE_SNOWFLAKES.push(flake);
   return flake;
 }
-function releaseSnowflake(flake) {
-  flake.style.display = "none";
-  const idx = ACTIVE_SNOWFLAKES.indexOf(flake);
-  if (idx > -1) {
-    ACTIVE_SNOWFLAKES.splice(idx, 1);
-  }
-  SNOWFLAKE_POOL.push(flake);
-}
-var snowflakeAnimationId;
 function animateSnowflakes() {
-  const innerHeight = window.innerHeight + 50;
   for (let i = ACTIVE_SNOWFLAKES.length - 1;i >= 0; i--) {
     const flake = ACTIVE_SNOWFLAKES[i];
     const p = SNOWFLAKE_PROPS.get(flake);
     p.x += p.drift;
     p.y += p.speed;
     p.rotation += p.rotationSpeed;
-    if (p.y > innerHeight) {
-      releaseSnowflake(flake);
-      getSnowflake();
+    if (p.y > VIEWPORT_HEIGHT) {
+      initSnowflake(flake);
     } else {
       updateSnowflakePosition(flake);
     }
   }
-  snowflakeAnimationId = requestAnimationFrame(animateSnowflakes);
+  requestAnimationFrame(animateSnowflakes);
+}
+
+// src/util.ts
+function getClassPackageName(name) {
+  return name.slice(0, name.lastIndexOf("."));
+}
+function getTextNodes(e) {
+  const walker = document.createTreeWalker(e, NodeFilter.SHOW_TEXT, null);
+  const nodes = [];
+  let node;
+  while (node = walker.nextNode()) {
+    nodes.push(node);
+  }
+  return nodes;
+}
+
+// src/parser/shared.ts
+function parseClassList(list) {
+  if (!(list instanceof HTMLElement) || hasParsed(list)) {
+    return;
+  }
+  const nodes = Array.from(list.childNodes);
+  nodes.forEach((node) => {
+    if (node.nodeType !== Node.TEXT_NODE) {
+      if (node.nodeType === Node.ELEMENT_NODE && node instanceof HTMLAnchorElement) {
+        node.classList.add(CSS_CLASSES.theme.class);
+      }
+      return;
+    }
+    parseTokens(node);
+  });
+}
+function parseTokens(node) {
+  const tokens = parseTokensFromText(node.data);
+  if (tokens.length === 0) {
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  tokens.forEach((token) => {
+    if (token.type === "keyword" /* KEYWORD */) {
+      const span = document.createElement("span");
+      span.textContent = token.value;
+      span.classList.add(CSS_CLASSES.theme.keyword);
+      fragment.appendChild(span);
+    } else if (token.type === "primitive" /* PRIMITIVE */) {
+      const span = document.createElement("span");
+      span.textContent = token.value;
+      span.classList.add(CSS_CLASSES.theme.primitive);
+      fragment.appendChild(span);
+    } else if (token.type === "class" /* CLASS */) {
+      const span = document.createElement("span");
+      span.textContent = token.value;
+      if (token.value.includes(".") && !(node.parentElement instanceof HTMLAnchorElement)) {
+        span.classList.add(CSS_CLASSES.theme.unresolved);
+        span.title = `unresolved type in ${getClassPackageName(token.value)}`;
+      } else {
+        span.classList.add(CSS_CLASSES.theme.class);
+      }
+      fragment.appendChild(span);
+    } else if (token.type === "syntax" /* SYNTAX */) {
+      const span = document.createElement("span");
+      span.textContent = token.value;
+      span.classList.add(CSS_CLASSES.theme.syntax);
+      fragment.appendChild(span);
+    } else if (token.type === "unknown" /* UNKNOWN */) {
+      const span = document.createElement("span");
+      span.textContent = token.value;
+      const parent = node.parentElement;
+      const parentParent = parent.parentElement;
+      if (parent instanceof HTMLAnchorElement) {
+        span.classList.add(CSS_CLASSES.theme.class);
+      } else if (parent.classList.contains("parameters") || parentParent.classList.contains("method-summary-table")) {
+        span.classList.add(CSS_CLASSES.theme.parameterName);
+      } else if (parent.nextSibling?.nodeType === Node.TEXT_NODE && parent.nextSibling?.textContent?.startsWith("(") || parentParent.querySelector(".parameters")) {
+        span.classList.add(CSS_CLASSES.theme.methodName);
+      } else {
+        span.classList.add(CSS_CLASSES.theme.fieldName);
+      }
+      fragment.appendChild(span);
+    } else {
+      fragment.append(token.value);
+    }
+  });
+  node.replaceWith(fragment);
+}
+function parseTokensFromText(text) {
+  const tokens = [];
+  let match;
+  while ((match = REGEX.modifierTypePattern.exec(text)) !== null) {
+    const value = match[0];
+    const type = Object.keys(match.groups).find((key) => match.groups[key]);
+    if (value.length === 0) {
+      continue;
+    }
+    if (type === "word") {
+      if (JAVA_KEYWORDS.has(value)) {
+        tokens.push({ type: "keyword" /* KEYWORD */, value });
+      } else if (JAVA_PRIMITIVE_TYPES.has(value)) {
+        tokens.push({ type: "primitive" /* PRIMITIVE */, value });
+      } else if (value[0] >= "a" && value[0] <= "z" && value.includes(".")) {
+        tokens.push({ type: "class" /* CLASS */, value });
+      } else {
+        tokens.push({ type: "unknown" /* UNKNOWN */, value });
+      }
+    } else {
+      tokens.push({ type, value });
+    }
+  }
+  return tokens;
+}
+
+// src/parser/class-description.ts
+function parseClassDescriptions() {
+  LOGGER.debug("Parsing class descriptions...");
+  parseClassDescription(document.querySelector(SELECTORS.classDescription));
+}
+function parseClassDescription(e) {
+  if (!(e instanceof HTMLElement) || hasParsed(e)) {
+    return;
+  }
+  const prevDisplay = e.style.display;
+  e.style.display = "none";
+  parseImplementedInterfaces(e.querySelector(".notes > dd > code"));
+  parseModifiers(e.querySelector(".modifiers"));
+  parseExtendsImplements(e.querySelector(".extends-implements"));
+  e.style.display = prevDisplay;
+}
+function parseImplementedInterfaces(e) {
+  if (!e) {
+    return;
+  }
+  parseClassList(e);
+}
+function parseModifiers(e) {
+  if (!e) {
+    return;
+  }
+  getTextNodes(e).forEach(parseTokens);
+}
+function parseExtendsImplements(e) {
+  if (!e) {
+    return;
+  }
+  Array.from(e.childNodes).forEach((node) => {
+    if (node.nodeType !== Node.TEXT_NODE) {
+      if (node.nodeType === Node.ELEMENT_NODE && node instanceof HTMLAnchorElement) {
+        node.classList.add(CSS_CLASSES.theme.class);
+      }
+      return;
+    }
+    parseTokens(node);
+  });
+}
+
+// src/parser/details.ts
+function parseDetails() {
+  LOGGER.debug("Parsing summary tables...");
+  parseDetailsSection(IDS.fieldDetails);
+  parseDetailsSection(IDS.constructorDetails);
+  parseDetailsSection(IDS.methodDetails);
+}
+function parseDetailsSection(id) {
+  const section = document.getElementById(id);
+  if (!section) {
+    LOGGER.warn(`No details section with id ${id} found.`);
+    return;
+  }
+  const prevDisplay = section.style.display;
+  section.style.display = "none";
+  section.querySelectorAll(SELECTORS.detailsBlock).forEach(parseDetailsBlock);
+  section.style.display = prevDisplay;
+}
+function parseDetailsBlock(e) {
+  if (!(e instanceof HTMLElement) || hasParsed(e)) {
+    return;
+  }
+  getTextNodes(e).forEach(parseTokens);
+  e.parentElement?.querySelector(".block")?.classList.add(CSS_CLASSES.theme.comment);
+}
+
+// src/parser/header.ts
+function parseHeader() {
+  LOGGER.debug(`Styling header text...`);
+  const e = document.querySelector("div.about-language");
+  if (!e || !(e instanceof HTMLElement) || hasParsed(e)) {
+    return;
+  }
+  const text = e.textContent;
+  e.replaceChildren();
+  const a = document.createElement("a");
+  a.classList.add("repository-link");
+  a.textContent = text;
+  a.title = "Theme support from javadoc-prettier \uD83D\uDC9D";
+  if (window.location.hostname.endsWith(".github.io")) {
+    const githubUser = window.location.hostname.split(".")[0];
+    const repositoryName = window.location.pathname.replaceAll("/", "");
+    a.href = `https://github.com/${githubUser}/${repositoryName}`;
+  }
+  e.appendChild(a);
+}
+
+// src/parser/inheritance-tree.ts
+function parseInheritanceTrees() {
+  LOGGER.debug("Parsing inheritance trees...");
+  document.querySelectorAll(SELECTORS.inheritanceTree).forEach(parseInheritanceTree);
+}
+function parseInheritanceTree(tree) {
+  if (!(tree instanceof HTMLElement) || hasParsed(tree)) {
+    return;
+  }
+  const label = tree.firstElementChild;
+  if (!label) {
+    return;
+  }
+  label.classList.add(CSS_CLASSES.theme.class);
+}
+
+// src/parser/summary.ts
+function parseSummaries() {
+  LOGGER.debug("Parsing summary tables...");
+  parseSummarySection(IDS.nestedClassSummary);
+  parseSummarySection(IDS.fieldSummary);
+  parseSummarySection(IDS.constructorSummary);
+  parseSummarySection(IDS.methodSummary);
+}
+function parseSummarySection(id) {
+  const section = document.getElementById(id);
+  if (!section) {
+    LOGGER.warn(`No summary table with id ${id} found.`);
+    return;
+  }
+  const prevDisplay = section.style.display;
+  section.style.display = "none";
+  parseSummaryTable(id, section.querySelector(SELECTORS.summaryTable));
+  section.querySelectorAll(SELECTORS.inheritedList).forEach(parseInheritedList);
+  section.style.display = prevDisplay;
+}
+function parseSummaryTable(id, e) {
+  if (!(e instanceof HTMLElement) || hasParsed(e)) {
+    return;
+  }
+  const isThreeColumn = e.classList.contains("three-column-summary");
+  const isTwoColumn = e.classList.contains("two-column-summary");
+  if (isThreeColumn) {
+    let second = id === IDS.nestedClassSummary || id === IDS.fieldSummary ? parseSummaryTableName : parseSummaryTableSignature;
+    e.querySelectorAll(".col-first > code").forEach(parseSummaryTableType);
+    e.querySelectorAll(".col-second > code").forEach(second);
+    e.querySelectorAll(".col-last > .block").forEach(parseSummaryTableDesc);
+  } else if (isTwoColumn) {
+    const first = id === IDS.constructorSummary ? parseSummaryTableSignature : parseSummaryTableName;
+    const firstColumnName = id === IDS.constructorSummary ? ".col-constructor-name" : ".col-first";
+    e.querySelectorAll(`${firstColumnName} > code`).forEach(first);
+    e.querySelectorAll(".col-last > code").forEach(parseSummaryTableDesc);
+  } else {
+    LOGGER.warn("Summary table found that isn't three/two column.");
+  }
+}
+function parseSummaryTableType(e) {
+  getTextNodes(e).forEach(parseTokens);
+}
+function parseSummaryTableName(e) {
+  if (e.childElementCount !== 1) {
+    LOGGER.warn("Summary table with name child size !== 1");
+    return;
+  }
+  const node = e.firstElementChild;
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    LOGGER.warn("Summary table name had a single node but the wrong type.");
+    return;
+  }
+  let clazz = CSS_CLASSES.theme.fieldName;
+  if (node.textContent.includes(".")) {
+    clazz = CSS_CLASSES.theme.class;
+  }
+  node.classList.add(clazz);
+}
+function parseSummaryTableSignature(e) {
+  e.querySelector(".member-name-link").classList.add(CSS_CLASSES.theme.methodName);
+  getTextNodes(e).filter((n) => !n.parentElement?.classList.contains("member-name-link")).forEach(parseTokens);
+}
+function parseSummaryTableDesc(e) {
+  e.classList.add(CSS_CLASSES.theme.comment);
+}
+function parseInheritedList(list) {
+  if (!(list instanceof HTMLElement) || hasParsed(list)) {
+    return;
+  }
+  list.querySelector("h3 > a:first-child").classList.add(CSS_CLASSES.theme.class);
+  const isField = list.parentElement?.id.startsWith("field");
+  const isMethod = list.parentElement?.id.startsWith("method");
+  let clazz = CSS_CLASSES.theme.class;
+  if (isField) {
+    clazz = CSS_CLASSES.theme.fieldName;
+  } else if (isMethod) {
+    clazz = CSS_CLASSES.theme.methodName;
+  }
+  const nodes = getTextNodes(list.querySelector("code"));
+  nodes.forEach((node) => {
+    if (node.parentElement instanceof HTMLAnchorElement) {
+      node.parentElement.classList.add(clazz);
+      return;
+    }
+  });
+}
+
+// src/parser.ts
+function parse() {
+  parseInheritanceTrees();
+  parseClassDescriptions();
+  parseSummaries();
+  parseDetails();
+  parseHeader();
+}
+function hasParsed(e) {
+  if (e.dataset["javadocPrettierParsed"]) {
+    return true;
+  }
+  e.dataset["javadocPrettierParsed"] = "1";
+  return false;
+}
+
+// src/index.ts
+function waitForIndexes(timeout = 3000) {
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(() => {
+      if (memberSearchIndex != null && moduleSearchIndex != null && packageSearchIndex != null && tagSearchIndex != null && typeSearchIndex != null) {
+        clearInterval(interval);
+        clearTimeout(timeoutId);
+        resolve();
+      }
+    }, 100);
+    const timeoutId = setTimeout(() => {
+      clearInterval(interval);
+      reject(new Error("Timed out waiting on javadoc's index scripts"));
+    }, timeout);
+  });
+}
+document.addEventListener("DOMContentLoaded", init);
+async function init() {
+  try {
+    const beforeWait = performance.now();
+    await waitForIndexes().then(() => {
+      const afterWait = performance.now();
+      LOGGER.info(`Waiting for indexes took ${Number.parseFloat(`${afterWait - beforeWait}`).toFixed()}ms`);
+    }).catch((reason) => {
+      LOGGER.error("Waiting for indexes raised an error:", reason);
+      return;
+    });
+    $.ui.autocomplete;
+    const beforeParser = performance.now();
+    parse();
+    const afterParser = performance.now();
+    LOGGER.info(`Element parser took ${Number.parseFloat(`${afterParser - beforeParser}`).toFixed()}ms!`);
+    activateEasterEgg();
+  } catch (error) {
+    LOGGER.error("An error occurred that stopped the script:", error);
+  }
 }
