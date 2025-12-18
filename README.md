@@ -22,7 +22,7 @@ javadoc ... --add-script "path/to/javadoc-prettier.min.js" --add-stylesheet "pat
 Getting the latest theme release however can be annoying, so you can create a dummy CSS file that will just import the styles from the latest release, like so:
 
 ```css
-@import url("https://raw.githubusercontent.com/aoqia194/javadoc-prettier/refs/heads/main/themes/vscode-dark-modern.css");
+@import url("https://raw.githubusercontent.com/aoqia194/javadoc-prettier/refs/heads/main/dist/themes/vscode-dark-modern.min.css");
 ```
 
 The css themes do not get included in releases as they are always latest, so you can find them all in the repository's `themes` folder.
