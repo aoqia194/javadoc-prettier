@@ -332,11 +332,10 @@ button#navbar-toggle-button .nav-bar-toggle-icon {
 /* ---------------------------------------------------------- */
 
 .theme-method-name {
-    color: var(--theme-branch-keyword-color) !important;
+    color: var(--theme-function-color) !important;
 }
 
-.theme-field-name,
-.theme-parameter-name {
+.theme-field-name {
     color: var(--theme-variable-color) !important;
 }
 
@@ -368,6 +367,10 @@ button#navbar-toggle-button .nav-bar-toggle-icon {
 .theme-comment,
 .theme-doctag-comment {
     color: var(--theme-comment-color) !important;
+}
+
+.theme-error {
+    color: red !important;
 }
 
 /* ------------------------------------------------------ */

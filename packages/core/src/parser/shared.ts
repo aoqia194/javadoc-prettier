@@ -1,4 +1,10 @@
-import { CSS_CLASSES, JAVA_KEYWORDS, JAVA_PRIMITIVE_TYPES, LOGGER, REGEX, TokenType } from "../constants.ts";
+import {
+    CSS_CLASSES,
+    JAVA_KEYWORDS,
+    JAVA_PRIMITIVE_TYPES,
+    REGEX,
+    TokenType,
+} from "../constants.ts";
 import { hasParsed } from "../parser.ts";
 import { getClassPackageName } from "../util.ts";
 
@@ -67,25 +73,33 @@ export function parseTokens(node: Text) {
             // TODO: This is just ewwwww
             //   most cases we kinda already know what its going to be
             //   before this function is called
+
             const parent = node.parentElement!;
             const parentParent = parent.parentElement!;
             if (parent instanceof HTMLAnchorElement) {
                 span.classList.add(CSS_CLASSES.theme.class);
             } else if (
+                // Parameters in method detail block.
                 parent.classList.contains("parameters") ||
                 parentParent.classList.contains("method-summary-table") ||
                 parent.firstElementChild?.classList.contains("member-name-link")
             ) {
                 span.classList.add(CSS_CLASSES.theme.parameterName);
             } else if (
+                // Method names with no parameters in method detail block.
                 (parent.nextSibling?.nodeType === Node.TEXT_NODE &&
                     parent.nextSibling?.textContent?.startsWith("(")) ||
+                // Method names with parameters in method detail block.
                 parentParent.querySelector(".parameters")
             ) {
-                // span.classList.add(CSS_CLASSES.theme.methodName);
-                LOGGER.warn("bababooey");
+                span.classList.add(CSS_CLASSES.theme.methodName);
             } else {
-                span.classList.add(CSS_CLASSES.theme.fieldName);
+                const last = tokens[tokens.length - 1]!;
+                if (last.type !== TokenType.SYNTAX && !last.value.endsWith(")")) {
+                    span.classList.add(CSS_CLASSES.theme.fieldName);
+                } else {
+                    span.classList.add(CSS_CLASSES.theme.error);
+                }
             }
 
             fragment.appendChild(span);

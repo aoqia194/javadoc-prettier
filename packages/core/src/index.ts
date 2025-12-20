@@ -28,7 +28,6 @@ function waitForIndexes(timeout: number = 3000): Promise<void> {
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
-    console.warn("hey");
     try {
         const beforeWait = performance.now();
         await waitForIndexes()
@@ -44,11 +43,6 @@ async function init() {
                 LOGGER.error("Waiting for indexes raised an error:", reason);
                 return;
             });
-
-        // Default javadoc scripts have a bug where the search will
-        //   try to use the below before jQuery UI has defined it.
-        // Just putting this here will force load jQuery UI or something.
-        // $.ui.autocomplete;
 
         const beforeParser = performance.now();
         parse();

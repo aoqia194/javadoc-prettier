@@ -39,6 +39,7 @@ export const REGEX = {
 
 export const CSS_CLASSES = {
     theme: {
+        error: "theme-error",
         keyword: "theme-keyword",
         primitive: "theme-type-primitive",
         class: "theme-type-class",
