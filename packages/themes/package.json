@@ -3,6 +3,8 @@
     "private": true,
     "scripts": {
         "build": "bun run build:css",
-        "build:css": "bun build src/*.css --outdir ../../dist/themes/"
+        "build:css": "bun build src/*.css --outdir ../../dist/themes/",
+        "build-prod": "bun run build-prod:css --production",
+        "build-prod:css": "bun build src/*.css --outdir ../../dist/themes/ --entry-naming '[name].min.[ext]'"
     }
 }

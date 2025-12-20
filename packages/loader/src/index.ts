@@ -1,7 +1,7 @@
 (function () {
     const script = document.createElement("script");
     script.src =
-        "https://cdn.jsdelivr.net/gh/aoqia194/javadoc-prettier@main/dist/core/javadoc-prettier.js";
+        "https://cdn.jsdelivr.net/gh/aoqia194/javadoc-prettier@main/dist/core/javadoc-prettier.min.js";
 
     script.onload = () => {
         console.info("[javadoc-prettier-loader] Script loaded successfully.");

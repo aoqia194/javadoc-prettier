@@ -8,9 +8,9 @@
     "scripts": {
         "clean": "rm -rf dist",
         "dev": "concurrently --names CORE,LOADER,LOADER,THEMES --prefix-colors '#f266d8,#7da6e8,#7da6e8,#e8d766' 'bun run --filter 'core' build:ts --watch' 'bun run --filter 'loader' build:ts --watch' 'bun run --filter 'loader' build:css --watch' 'bun run --filter 'themes' build:css --watch'",
-        "prod": "bun run build-min",
+        "prod": "bun run build-prod",
         "build": "bun run --filter '*' build",
-        "build-min": "bun run build --minify"
+        "build-prod": "bun run --filter '*' build-prod"
     },
     "devDependencies": {
         "concurrently": "^9.2.1"

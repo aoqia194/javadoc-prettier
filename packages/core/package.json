@@ -3,6 +3,8 @@
     "private": true,
     "scripts": {
         "build": "bun run build:ts",
-        "build:ts": "bun build src/index.ts --outfile ../../dist/core/$npm_package_name.js"
+        "build:ts": "bun build src/index.ts --outfile ../../dist/core/$npm_package_name.js",
+        "build-prod": "bun run build-prod:ts --production",
+        "build-prod:ts": "bun build src/index.ts --outfile ../../dist/core/$npm_package_name.min.js"
     }
 }
