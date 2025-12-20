@@ -1,5 +1,5 @@
-import { LOGGER } from "../constants";
-import { hasParsed } from "../parser";
+import { LOGGER } from "../constants.ts";
+import { hasParsed } from "../parser.ts";
 
 export function parseHeader() {
     LOGGER.debug(`Styling header text...`);
@@ -18,9 +18,10 @@ export function parseHeader() {
     a.textContent = text;
     a.title = "Theme support from javadoc-prettier 💝";
 
-    if (window.location.hostname.endsWith(".github.io")) {
-        const githubUser = window.location.hostname.split(".")[0];
-        const repositoryName = window.location.pathname.replaceAll("/", "");
+    const hostname = globalThis.location.hostname;
+    if (hostname.endsWith(".github.io")) {
+        const githubUser = hostname.split(".")[0];
+        const repositoryName = globalThis.location.pathname.replaceAll("/", "");
         a.href = `https://github.com/${githubUser}/${repositoryName}`;
     }
 

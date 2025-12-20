@@ -1,7 +1,7 @@
-import { CSS_CLASSES, IDS, LOGGER, SELECTORS } from "../constants";
-import { hasParsed } from "../parser";
-import { getTextNodes } from "../util";
-import { parseTokens } from "./shared";
+import { CSS_CLASSES, IDS, LOGGER, SELECTORS } from "../constants.ts";
+import { hasParsed } from "../parser.ts";
+import { getTextNodes } from "../util.ts";
+import { parseTokens } from "./shared.ts";
 
 export function parseDetails() {
     LOGGER.debug("Parsing summary tables...");

@@ -1,4 +1,5 @@
-import { VIEWPORT_HEIGHT } from "./constants";
+// NOTE: Maybe rewrite snow falling container
+//   We can make the snow elements use animation instead of actually updating positions.
 
 const EASTER_EGG_TEXT = "christmas";
 const SNOWFLAKE_CHARS = ["❄", "❅", "❆"];
@@ -58,7 +59,7 @@ function createSnowflakeOverlay() {
     for (let i = 0; i < numFlakes; i++) {
         const flake = getSnowflake();
         const p = SNOWFLAKE_PROPS.get(flake)!;
-        p.y = Math.random() * window.innerHeight - window.innerHeight;
+        p.y = Math.random() * globalThis.innerHeight - globalThis.innerHeight;
     }
 
     animateSnowflakes();
@@ -82,7 +83,7 @@ function initSnowflake(flake: HTMLDivElement) {
     flake.style.willChange = "transform";
 
     SNOWFLAKE_PROPS.set(flake, {
-        x: Math.random() * window.innerWidth,
+        x: Math.random() * innerWidth,
         y: -50,
         speed: Math.random() * 1.5 + 0.5,
         drift: (Math.random() - 0.5) * 0.5,
@@ -99,7 +100,7 @@ function updateSnowflakePosition(flake: HTMLDivElement) {
 }
 
 function getSnowflake() {
-    let flake = createSnowflake();
+    const flake = createSnowflake();
     initSnowflake(flake);
     ACTIVE_SNOWFLAKES.push(flake);
     return flake;
@@ -115,7 +116,7 @@ function animateSnowflakes() {
         p.y += p.speed;
         p.rotation += p.rotationSpeed;
 
-        if (p.y > VIEWPORT_HEIGHT) {
+        if (p.y > innerHeight) {
             initSnowflake(flake);
         } else {
             updateSnowflakePosition(flake);

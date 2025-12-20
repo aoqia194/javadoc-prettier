@@ -1,8 +1,8 @@
-import { parseClassDescriptions } from "./parser/class-description";
-import { parseDetails } from "./parser/details";
-import { parseHeader } from "./parser/header";
-import { parseInheritanceTrees } from "./parser/inheritance-tree";
-import { parseSummaries } from "./parser/summary";
+import { parseClassDescriptions } from "./parser/class-description.ts";
+import { parseDetails } from "./parser/details.ts";
+import { parseHeader } from "./parser/header.ts";
+import { parseInheritanceTrees } from "./parser/inheritance-tree.ts";
+import { parseSummaries } from "./parser/summary.ts";
 
 export function parse() {
     parseInheritanceTrees();

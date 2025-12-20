@@ -1,0 +1,9 @@
+{
+    "name": "loader",
+    "private": true,
+    "scripts": {
+        "build": "bun run build:ts && bun run build:css",
+        "build:ts": "bun build src/index.ts --outfile ../../dist/loader/$npm_package_name-loader.js",
+        "build:css": "bun build src/index.css --outfile ../../dist/loader/$npm_package_name-loader.css"
+    }
+}

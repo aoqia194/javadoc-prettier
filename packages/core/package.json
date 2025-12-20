@@ -1,0 +1,8 @@
+{
+    "name": "core",
+    "private": true,
+    "scripts": {
+        "build": "bun run build:ts",
+        "build:ts": "bun build src/index.ts --outfile ../../dist/core/$npm_package_name.js"
+    }
+}

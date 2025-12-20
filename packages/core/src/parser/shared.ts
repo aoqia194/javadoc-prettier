@@ -1,6 +1,6 @@
-import { CSS_CLASSES, JAVA_KEYWORDS, JAVA_PRIMITIVE_TYPES, REGEX, TokenType } from "../constants";
-import { hasParsed } from "../parser";
-import { getClassPackageName } from "../util";
+import { CSS_CLASSES, JAVA_KEYWORDS, JAVA_PRIMITIVE_TYPES, LOGGER, REGEX, TokenType } from "../constants.ts";
+import { hasParsed } from "../parser.ts";
+import { getClassPackageName } from "../util.ts";
 
 /**
  * For class types in lists such as:
@@ -12,7 +12,7 @@ export function parseClassList(list: Element) {
         return;
     }
 
-    const nodes = Array.from(list.childNodes);
+    const nodes: Array<ChildNode> = Array.from(list.childNodes);
     nodes.forEach((node) => {
         if (node.nodeType !== Node.TEXT_NODE) {
             if (node.nodeType === Node.ELEMENT_NODE && node instanceof HTMLAnchorElement) {
@@ -73,7 +73,8 @@ export function parseTokens(node: Text) {
                 span.classList.add(CSS_CLASSES.theme.class);
             } else if (
                 parent.classList.contains("parameters") ||
-                parentParent.classList.contains("method-summary-table")
+                parentParent.classList.contains("method-summary-table") ||
+                parent.firstElementChild?.classList.contains("member-name-link")
             ) {
                 span.classList.add(CSS_CLASSES.theme.parameterName);
             } else if (
@@ -81,7 +82,8 @@ export function parseTokens(node: Text) {
                     parent.nextSibling?.textContent?.startsWith("(")) ||
                 parentParent.querySelector(".parameters")
             ) {
-                span.classList.add(CSS_CLASSES.theme.methodName);
+                // span.classList.add(CSS_CLASSES.theme.methodName);
+                LOGGER.warn("bababooey");
             } else {
                 span.classList.add(CSS_CLASSES.theme.fieldName);
             }

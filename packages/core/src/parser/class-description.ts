@@ -1,7 +1,7 @@
-import { CSS_CLASSES, LOGGER, SELECTORS } from "../constants";
-import { hasParsed } from "../parser";
-import { getTextNodes } from "../util";
-import { parseClassList, parseTokens } from "./shared";
+import { CSS_CLASSES, LOGGER, SELECTORS } from "../constants.ts";
+import { hasParsed } from "../parser.ts";
+import { getTextNodes } from "../util.ts";
+import { parseClassList, parseTokens } from "./shared.ts";
 
 export function parseClassDescriptions() {
     LOGGER.debug("Parsing class descriptions...");

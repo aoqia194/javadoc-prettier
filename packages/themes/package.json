@@ -1,0 +1,8 @@
+{
+    "name": "themes",
+    "private": true,
+    "scripts": {
+        "build": "bun run build:css",
+        "build:css": "bun build src/*.css --outdir ../../dist/themes/"
+    }
+}

@@ -1,4 +1,3 @@
-type TokenList = Array<{ type: string; value: string }>;
 type SnowflakeProperty = {
     x: number;
     y: number;

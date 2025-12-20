@@ -36,7 +36,5 @@ For example, the javadoc args used for [ProjectZomboidJavaDocs](https://github.c
 ### Building
 
 This project uses Bun purely as a developer environment and for artifact minification, but in the end it is transpiled into JavaScript as seen in `dist` folder.
-To do stuff with Bun, you can check out the `package.json` to see which scripts there are, and run them using `bun run <script>`.
 
-You want to run `bun install` to get the dependencies.
-Typically, for development I run `bun run dev`. For release, I run both `bun run build` and `bun run build-min`.
+You want to run `bun install` to get the dependencies, and typically for development I run `bun run dev`. For release, I run `bun run prod`.

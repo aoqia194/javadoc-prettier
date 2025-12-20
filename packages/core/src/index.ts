@@ -1,6 +1,6 @@
-import { activateEasterEgg } from "./easter-egg";
-import { LOGGER } from "./constants";
-import { parse } from "./parser";
+import { activateEasterEgg } from "./easter-egg.ts";
+import { LOGGER } from "./constants.ts";
+import { parse } from "./parser.ts";
 
 function waitForIndexes(timeout: number = 3000): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -28,6 +28,7 @@ function waitForIndexes(timeout: number = 3000): Promise<void> {
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
+    console.warn("hey");
     try {
         const beforeWait = performance.now();
         await waitForIndexes()
@@ -47,7 +48,7 @@ async function init() {
         // Default javadoc scripts have a bug where the search will
         //   try to use the below before jQuery UI has defined it.
         // Just putting this here will force load jQuery UI or something.
-        $.ui.autocomplete;
+        // $.ui.autocomplete;
 
         const beforeParser = performance.now();
         parse();

@@ -1,7 +1,7 @@
-import { CSS_CLASSES, IDS, LOGGER, SELECTORS } from "../constants";
-import { hasParsed } from "../parser";
-import { getTextNodes } from "../util";
-import { parseTokens } from "./shared";
+import { CSS_CLASSES, IDS, LOGGER, SELECTORS } from "../constants.ts";
+import { hasParsed } from "../parser.ts";
+import { getTextNodes } from "../util.ts";
+import { parseTokens } from "./shared.ts";
 
 export function parseSummaries() {
     LOGGER.debug("Parsing summary tables...");
@@ -36,7 +36,7 @@ function parseSummaryTable(id: string, e: Element) {
     const isThreeColumn = e.classList.contains("three-column-summary");
     const isTwoColumn = e.classList.contains("two-column-summary");
     if (isThreeColumn) {
-        let second =
+        const second =
             id === IDS.nestedClassSummary || id === IDS.fieldSummary
                 ? parseSummaryTableName
                 : parseSummaryTableSignature;

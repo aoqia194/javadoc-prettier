@@ -332,11 +332,11 @@ button#navbar-toggle-button .nav-bar-toggle-icon {
 /* ---------------------------------------------------------- */
 
 .theme-method-name {
-    color: var(--theme-function-color) !important;
+    color: var(--theme-branch-keyword-color) !important;
 }
 
 .theme-field-name,
-.theme-method-parameter {
+.theme-parameter-name {
     color: var(--theme-variable-color) !important;
 }
 

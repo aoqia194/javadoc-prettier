@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 export const JAVA_PRIMITIVE_TYPES = new Set([
     "byte",
     "short",
@@ -88,6 +89,3 @@ export const enum TokenType {
     SYNTAX = "syntax",
     UNKNOWN = "unknown",
 }
-
-export const VIEWPORT_WIDTH = window.innerWidth;
-export const VIEWPORT_HEIGHT = window.innerHeight;

@@ -1,24 +1,28 @@
 {
     "name": "javadoc-prettier",
-    "module": "src/index.ts",
-    "peerDependencies": {
-        "typescript": "^5"
-    },
     "private": true,
-    "scripts": {
-        "clean": "rm -rf dist/ && rm -rf node_modules/",
-        "dev": "concurrently \"bun run build-min:ts --watch\" \"bun run build-min:css --watch\"",
-        "build": "bun run build:ts && bun run build:css",
-        "build:ts": "bun build src/index.ts --outdir ./dist --entry-naming javadoc-prettier.js --target browser",
-        "build:css": "bun build themes/*.css --outdir ./dist/themes",
-        "build-min": "bun run build-min:ts && bun run build-min:css",
-        "build-min:ts": "bun build src/index.ts --outdir ./dist --entry-naming javadoc-prettier.min.js --target browser --minify --sourcemap",
-        "build-min:css": "bun build themes/*.css --outdir ./dist/themes --entry-naming [name].min.[ext] --minify"
-    },
     "type": "module",
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "clean": "rm -rf dist",
+        "dev": "concurrently --names CORE,LOADER,LOADER,THEMES --prefix-colors '#f266d8,#7da6e8,#7da6e8,#e8d766' 'bun run --filter 'core' build:ts --watch' 'bun run --filter 'loader' build:ts --watch' 'bun run --filter 'loader' build:css --watch' 'bun run --filter 'themes' build:css --watch'",
+        "prod": "bun run build-min",
+        "build": "bun run --filter '*' build",
+        "build-min": "bun run build --minify"
+    },
     "devDependencies": {
-        "@types/jquery": "^3.5.33",
-        "@types/jqueryui": "^1.12.24",
         "concurrently": "^9.2.1"
+    },
+    "homepage": "https://github.com/aoqia194/javadoc-prettier",
+    "author": {
+        "name": "aoqia",
+        "email": "aoqia@aoqia.dev",
+        "url": "https://github.com/aoqia194"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/aoqia194/javadoc-prettier"
     }
 }

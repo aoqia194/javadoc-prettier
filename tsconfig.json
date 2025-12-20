@@ -20,13 +20,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
+    "noImplicitAny": true,
 
     // Some stricter flags (disabled by default)
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noPropertyAccessFromIndexSignature": true,
-
-    "strictNullChecks": true,
-    "noImplicitAny": true
+    "noPropertyAccessFromIndexSignature": true
   }
 }

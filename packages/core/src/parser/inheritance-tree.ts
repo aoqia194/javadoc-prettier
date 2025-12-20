@@ -1,5 +1,5 @@
-import { CSS_CLASSES, LOGGER, SELECTORS } from "../constants";
-import { hasParsed } from "../parser";
+import { CSS_CLASSES, LOGGER, SELECTORS } from "../constants.ts";
+import { hasParsed } from "../parser.ts";
 
 export function parseInheritanceTrees() {
     LOGGER.debug("Parsing inheritance trees...");
