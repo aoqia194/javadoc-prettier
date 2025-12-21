@@ -43,6 +43,12 @@ async function init() {
                 LOGGER.error("Waiting for indexes raised an error:", reason);
                 return;
             });
+        
+        // Default javadoc scripts have a bug where the search will
+        //   try to use the below before jQuery UI has defined it.
+        // Just putting this here will force load jQuery UI or something.
+        // I actually don't even know if the above is correct, but this fixes it so idk.
+        $.ui.autocomplete;
 
         const beforeParser = performance.now();
         parse();
