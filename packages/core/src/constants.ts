@@ -58,6 +58,7 @@ export const SELECTORS = {
     classDescription: "#class-description",
     summaryTable: ".summary-table",
     detailsBlock: ".detail .member-signature",
+    methodDetailsToc: ".toc-list > li:nth-child(8) > .toc-list > li > a",
 };
 
 export const IDS = {
@@ -65,7 +66,6 @@ export const IDS = {
     fieldSummary: "field-summary",
     constructorSummary: "constructor-summary",
     methodSummary: "method-summary",
-
     fieldDetails: "field-detail",
     constructorDetails: "constructor-detail",
     methodDetails: "method-detail",
@@ -86,6 +86,8 @@ export const enum TokenType {
     PRIMITIVE = "primitive",
     UNRESOLVED = "unresolved",
     CLASS = "class",
+    FIELD = "field",
+    METHOD = "method",
     WHITESPACE = "whitespace",
     SYNTAX = "syntax",
     UNKNOWN = "unknown",

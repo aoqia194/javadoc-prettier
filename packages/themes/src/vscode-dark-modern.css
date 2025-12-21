@@ -85,7 +85,8 @@
     /* accent-color: var(--user-accent-color); */
 
     scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
-    scroll-behavior: smooth;
+    /* It takes a little longer, but looks cooler */
+    /* scroll-behavior: smooth; */
 
     /* Because Oracle's shitty style.js causes heaps of forced reflows... */
     /* will-change: scroll-position; */
@@ -193,6 +194,11 @@ input[type="text"] {
     padding: 0.125rem 0.625rem;
 }
 
+/* TOC list navbar main header texts */
+.toc > .toc-list > li > a:not(.current-selection) {
+    color: var(--navbar-text-color);
+}
+
 /* Navbar close open icon */
 button#navbar-toggle-button .nav-bar-toggle-icon {
     background-color: white;
@@ -270,7 +276,7 @@ button#navbar-toggle-button .nav-bar-toggle-icon {
         transform: rotate(45deg);
         animation: shimmer 3s infinite;
 
-        contain: layout style paint;
+        contain: strict;
     }
 
     /* the label hover effect */
@@ -376,6 +382,10 @@ button#navbar-toggle-button .nav-bar-toggle-icon {
 /* ------------------------------------------------------ */
 /* Optimisations to original stylesheet because it's slow */
 /* ------------------------------------------------------ */
+
+:root {
+    font-display: swap;
+}
 
 /* .title,
 nav a:link,

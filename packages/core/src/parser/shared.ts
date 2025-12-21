@@ -37,8 +37,25 @@ export function parseTokens(node: Text) {
         return;
     }
 
+    replaceTokens(node, tokens);
+}
+
+export function parseTokensWithType(node: Text, type: TokenType) {
+    const tokens = parseTokensFromText(node.data);
+    if (tokens.length === 0) {
+        return;
+    }
+
+    replaceTokens(node, tokens, type);
+}
+
+function replaceTokens(node: Text, tokens: TokenList, type?: TokenType) {
     const fragment = document.createDocumentFragment();
     tokens.forEach((token) => {
+        if (type) {
+            token.type = type;
+        }
+
         if (token.type === TokenType.KEYWORD) {
             const span = document.createElement("span");
             span.textContent = token.value;
@@ -60,6 +77,11 @@ export function parseTokens(node: Text) {
                 span.classList.add(CSS_CLASSES.theme.class);
             }
 
+            fragment.appendChild(span);
+        } else if (token.type === TokenType.FIELD) {
+            const span = document.createElement("span");
+            span.textContent = token.value;
+            span.classList.add(CSS_CLASSES.theme.fieldName);
             fragment.appendChild(span);
         } else if (token.type === TokenType.SYNTAX) {
             const span = document.createElement("span");
@@ -106,8 +128,6 @@ export function parseTokens(node: Text) {
         } else {
             fragment.append(token.value);
         }
-
-        // LOGGER.debug("Added token type:", token.type);
     });
 
     node.replaceWith(fragment);

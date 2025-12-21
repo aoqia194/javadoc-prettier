@@ -14,7 +14,7 @@ export function parseDetails() {
 function parseDetailsSection(id: string) {
     const section = document.getElementById(id);
     if (!section) {
-        LOGGER.warn(`No details section with id ${id} found.`);
+        LOGGER.debug(`No details section with id ${id} found.`);
         return;
     }
 

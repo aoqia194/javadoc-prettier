@@ -15,7 +15,7 @@ export function parseSummaries() {
 function parseSummarySection(id: string) {
     const section = document.getElementById(id);
     if (!section) {
-        LOGGER.warn(`No summary table with id ${id} found.`);
+        LOGGER.debug(`No summary table with id ${id} found.`);
         return;
     }
 

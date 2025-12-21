@@ -6,10 +6,16 @@ import { parseSummaries } from "./parser/summary.ts";
 
 export function parse() {
     parseInheritanceTrees();
+    // parseHierarchyLists();
     parseClassDescriptions();
     parseSummaries();
     parseDetails();
     parseHeader();
+    // TODO: Too expensive... Think about it.
+    // parseTableOfContents();
+    // TODO: Tricky because it's dynamically updated
+    // Probably need to use a mutation observer and watch for DOM changes..
+    // parseAutocomplete();
 }
 
 export function hasParsed(e: HTMLElement) {
