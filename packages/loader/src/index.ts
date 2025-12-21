@@ -1,5 +1,6 @@
 (function () {
     const script = document.createElement("script");
+    script.async = true;
     script.src =
         "https://cdn.jsdelivr.net/gh/aoqia194/javadoc-prettier@main/dist/core/javadoc-prettier.min.js";
 
