@@ -95,7 +95,15 @@ function initSnowflake(flake: HTMLDivElement) {
 }
 
 function updateSnowflakePosition(flake: HTMLDivElement) {
-    const p = SNOWFLAKE_PROPS.get(flake)!;
+    const p = SNOWFLAKE_PROPS.get(flake);
+    if (p == null) {
+        return;
+    }
+
+    if (p.x == null || p.y == null || p.rotation == null) {
+        return;
+    }
+
     flake.style.transform = `translate3d(${p.x}px, ${p.y}px, 0px) rotate(${p.rotation}deg)`;
 }
 

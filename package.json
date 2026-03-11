@@ -1,6 +1,6 @@
 {
     "name": "javadoc-prettier",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "private": true,
     "type": "module",
     "workspaces": [
@@ -14,7 +14,7 @@
         "build-prod": "bun run --filter '*' build-prod"
     },
     "devDependencies": {
-        "@types/jquery": "^3.5.33",
+        "@types/jquery": "^3.5.34",
         "@types/jqueryui": "^1.12.24",
         "concurrently": "^9.2.1"
     },
